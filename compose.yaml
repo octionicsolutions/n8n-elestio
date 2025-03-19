@@ -1,0 +1,85 @@
+version: "3.8"
+volumes:
+  db_data:
+  n8n:
+  redis_data:
+x-shared: &shared
+  restart: always
+  image: n8nio/n8n:${SOFTWARE_VERSION_TAG}
+  environment:
+    DB_TYPE: postgresdb
+    DB_POSTGRESDB_HOST: postgres
+    DB_POSTGRESDB_PORT: 5432
+    DB_POSTGRESDB_DATABASE: ${POSTGRES_DB}
+    DB_POSTGRESDB_USER: ${POSTGRES_USER}
+    DB_POSTGRESDB_PASSWORD: ${SOFTWARE_PASSWORD}
+    EXECUTIONS_MODE: queue
+    QUEUE_BULL_REDIS_HOST: redis
+    QUEUE_HEALTH_CHECK_ACTIVE: "true"
+    WEBHOOK_TUNNEL_URL: https://${DOMAIN}
+    WEBHOOK_URL: https://${DOMAIN}
+    N8N_BASIC_AUTH_ACTIVE: "true"
+    N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
+    N8N_BASIC_AUTH_PASSWORD: ${SOFTWARE_PASSWORD}
+    N8N_HOST: ${DOMAIN}
+    N8N_EMAIL_MODE: "smtp"
+    N8N_SMTP_HOST: ${SMTP_HOST}
+    N8N_SMTP_PORT: ${SMTP_PORT}
+    N8N_SMTP_USER: " "
+    N8N_SMTP_PASS: " "
+    N8N_SMTP_SENDER: ${SMTP_FROM_EMAIL}
+    N8N_SMTP_SSL: "false"
+    NODE_TLS_REJECT_UNAUTHORIZED: 0
+    EXECUTIONS_DATA_PRUNE: ${EXECUTIONS_DATA_PRUNE}
+    EXECUTIONS_DATA_MAX_AGE: ${EXECUTIONS_DATA_MAX_AGE}
+    N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+    N8N_DEFAULT_BINARY_DATA_MODE: filesystem
+    N8N_PAYLOAD_SIZE_MAX: 32
+  links:
+    - postgres
+    - redis
+  volumes:
+    - ./n8n:/home/node/.n8n
+  depends_on:
+    redis:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    container_name: db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${SOFTWARE_PASSWORD}
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:latest
+    restart: always
+    container_name: cache    
+    volumes:
+      - ./redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  n8n:
+    <<: *shared
+    dns:
+      - 8.8.8.8    
+    ports:
+      - 172.17.0.1:5678:5678
+  n8n-worker:
+    <<: *shared
+    command: worker
+    depends_on:
+      - n8n
