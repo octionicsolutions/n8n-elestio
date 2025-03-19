@@ -1,4 +1,4 @@
-FROM n8nio/n8n:${SOFTWARE_VERSION_TAG}
+FROM n8nio/n8n:latest
 USER root
 RUN apk --no-cache add bash util-linux \
   ffmpeg && \

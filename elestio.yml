@@ -11,8 +11,6 @@ ports:
     # login: "root"
     # password: "random_password"
 environments:
-  - key: "SOFTWARE_VERSION_TAG"
-    value: "latest"
   - key: "SOFTWARE_PASSWORD"
     value: "random_password"
   - key: "DOMAIN"
