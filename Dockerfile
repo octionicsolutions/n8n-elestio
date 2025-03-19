@@ -9,5 +9,5 @@ RUN mkdir -p /home/node/.n8n/custom \
  && cd /home/node/.n8n/custom \
  && npm install \
  n8n-nodes-pgp \
-RUN chown -R 1000:1000 /home/node/.n8n/nodes
-USER 1000
+#RUN chown -R node:node /home/node/.n8n/nodes
+#USER node
