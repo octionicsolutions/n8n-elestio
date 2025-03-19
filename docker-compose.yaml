@@ -5,7 +5,7 @@ volumes:
   redis_data:
 x-shared: &shared
   restart: always
-  image: n8nio/n8n:${SOFTWARE_VERSION_TAG}
+  build: .
   environment:
     DB_TYPE: postgresdb
     DB_POSTGRESDB_HOST: postgres
