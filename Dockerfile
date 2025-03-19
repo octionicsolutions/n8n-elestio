@@ -1,7 +1,7 @@
 FROM n8nio/n8n:latest
 USER root
 RUN apk --no-cache add bash util-linux \
-  ffmpeg && \
+  ffmpeg 7zip && \
   rm -rf /var/cache/apk/*
 RUN mkdir -p /home/node/.n8n/nodes \
  && cd /home/node/.n8n/nodes 
