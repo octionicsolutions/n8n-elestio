@@ -1,3 +1,1 @@
 # nothing to do here ...
-
-chmod 777 -R ./n8n
