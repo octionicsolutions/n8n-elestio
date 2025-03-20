@@ -11,5 +11,5 @@ RUN cd /usr/local/lib/node_modules/n8n && pnpm install n8n-nodes-appflowy
 # && npm install \
 # n8n-nodes-pgp \
 # n8n-nodes-ninox
-RUN chown -R node:node /home/node/.n8n/nodes
+#RUN chown -R node:node /home/node/.n8n/nodes
 USER node
