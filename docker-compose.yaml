@@ -6,6 +6,7 @@ volumes:
 x-shared: &shared
   restart: always
   build: .
+  command: sh -c "mkdir -p /home/node/.n8n/custom && cd /home/node/.n8n/custom && npm install n8n-nodes-pgp && n8n"
   environment:
     DB_TYPE: postgresdb
     DB_POSTGRESDB_HOST: postgres
